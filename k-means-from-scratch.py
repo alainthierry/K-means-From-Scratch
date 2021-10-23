@@ -7,14 +7,18 @@ import pandas as pd
 
 class KMeansFromScratch(object):
     """
-    Implementation of K-means, a clustering machine learning algorithm in the of
+    Implementation of K-means, a clustering machine learning algorithm in the case of
     Unsupervised learning from scratch !
     
     Attributes:
         n_clusters(integer): The number of cluster chosen
         n_iterations(integer): The number of iterations to run the algorithm
         random_state(integer)
+        centroids_(list): This is a class attribute contains the centroid values after
+        training(fitting)
     """
+    centroids_ = []
+    
     def __init__(self, n_clusters, n_iterations, random_state):
         self.n_clusters = n_clusters
         self.n_iterations = n_iterations
@@ -38,8 +42,7 @@ class KMeansFromScratch(object):
 
                 return np.round(math.sqrt(distance), 3)
             else:
-                print("The xs vectors do not have the same length... !")
-                exit()
+                return("The args vectors do not have the same length... !")
 
         except Exception as e:
             print('The vectors must be arry or list ... !')
@@ -86,7 +89,7 @@ class KMeansFromScratch(object):
 
             return index
         else:
-            return ("Warning ! The array must contain at least two values ... !")
+            return("Warning ! The array must contain at least two values ... !")
     
     def get_centroids_mean(self, clusterd_data):
         """
@@ -100,7 +103,7 @@ class KMeansFromScratch(object):
         """
 
         centroids = []
-        
+
         for k_cluster in range(self.n_clusters):
             centroids.append(clusterd_data[k_cluster].mean(axis=0))
 
@@ -129,8 +132,8 @@ class KMeansFromScratch(object):
             temp[f'k_{k_cluster}'] = liste
 
         """
-        In this data set below(distances), every column represent a k cluster. The row represents
-        the distance between one observation and the whole k clusters.
+        In this data set below(distances), every column represents a k cluster.
+        The row represents. The distance between one observation and the whole k clusters.
         """
         distances = pd.DataFrame(data = temp).values
 
@@ -167,32 +170,59 @@ class KMeansFromScratch(object):
             clusters = self.clustering(data, centroids)
             
             if self.n_iterations <= 0:
-                print("The number of n_iterations must be at least 2 ... !")
+                print("The number of iterations must be at least 3 ... !")
 
             elif self.n_iterations == 1:
                 return clusters, centroids
             else:
-                print(f'{centroids}\n')
                 for _ in range(self.n_iterations):
                     centroids = self.get_centroids_mean(clusters)
-                    clusters = self.clustering(data, centroids)
-                    print(f'{centroids}\n')
-
+                    clusters = self.clustering(data, centroids) 
+                
+                KMeansFromScratch.centroids_ = centroids
                 return clusters, centroids
 
         except Exception as e:
-            print(f"""This {e} has been returned ! The variable data must have the wrong data structure ... !\n
-            Please check the fit function args type by running help(fit) ... !""")
+            print(f"""This {e} has been returned ! The variable data must have the wrong
+            data structure ... !\n Please check the fit function args type by running help(fit)
+            ... !""")
+    
+    def predict(self, new_entry):
+        """
+        Predicting a new data point after training the model
+        
+        Arg(s):
+            new_entry(list): The new data point to predict using the built model
+        Return(s):
+            (str): The answer of the prediction
+        """
+        try:
+            distances = []
+            centroids = KMeansFromScratch.centroids_
+            
+            if len(centroids) != 0:
+                for centroid in centroids:
+                    distances.append(self.euclidean_distance(centroid, new_entry))
+                
+                cluster = self.get_min_index(distances)
+                print(f""" This data point {new_entry} belongs to the cluster {cluster+1}, and
+                    distances between centroids are {distances} !""")
+                
+            else:
+                print(""" Oops ! I did it again...!
+                Please, fit your model by providing the data to the fit method before predicting... !""")
+        except Exception as e:
+            print(f"This {e} occurs !")
 
 if __name__ == '__main__':
     X = [2, 3]
     Y = [4, 5, 2, 1.5]
 
-    df = pd.read_csv("/home/alain/Documents/MSD/Projects/Kmeans/sklearn/abalone.csv")
+    df = pd.read_csv("/home/alain/Documents/MSD/Projects/Kmeans/Notebooks/abalone.csv")
     header = ['LongestShell', 'Diameter']
     df = df[header]
     cluter = KMeansFromScratch(n_clusters=3, n_iterations=4, random_state=47)
     clusters = cluter.fit(df.values)
-    print(f"The returned centroids \n{clusters[1]}")
+    print(f"The returned centroids \n{clusters[1]} {cluter.predict([2, 0.5])}")
 
 	
