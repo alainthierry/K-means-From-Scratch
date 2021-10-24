@@ -14,8 +14,8 @@ class KMeansFromScratch(object):
         n_clusters(integer): The number of cluster chosen
         n_iterations(integer): The number of iterations to run the algorithm
         random_state(integer)
-        centroids_(list): This is a class attribute contains the centroid values after
-        training(fitting)
+        centroids_(list): This is a class attribute that contains the centroid values after
+        training(fit)
     """
     centroids_ = []
     
@@ -23,7 +23,8 @@ class KMeansFromScratch(object):
         self.n_clusters = n_clusters
         self.n_iterations = n_iterations
         self.random_state = random_state
-        
+
+
     def euclidean_distance(self, X, Y):
         """
         Compute euclidean distance between X and Y
@@ -42,11 +43,12 @@ class KMeansFromScratch(object):
 
                 return np.round(math.sqrt(distance), 3)
             else:
-                return("The args vectors do not have the same length... !")
+                return("Oops ! The args vectors do not have the same length... !")
 
         except Exception as e:
-            print('The vectors must be arry or list ... !')
-            
+            print('Oops ! The vectors must be arry or list ... !')
+
+
     def get_centroids(self, dataset):
         """
         Getting randomly centroids values
@@ -66,7 +68,8 @@ class KMeansFromScratch(object):
             centroids.append(dataset[centroid_index])
 
         return np.array(centroids)
-    
+
+
     def get_min_index(slef, array):
         """
         Given an array of at least two values, return the index of the minimim valu that
@@ -89,27 +92,28 @@ class KMeansFromScratch(object):
 
             return index
         else:
-            return("Warning ! The array must contain at least two values ... !")
-    
-    def get_centroids_mean(self, clusterd_data):
+            return("Oops ! The array must contain at least two(2) values ... !")
+
+
+    def get_centroids_mean(self, data):
         """
         Getting the centroid as the mean of each previous cluster as the new centroid
 
         Arg(s):
-            clusterd_data(list): This is especially the return of clustering function
+            data(np.array): This is especially the return of clustering function
         Return(s):
             centroids(np.array): The centroids as means of the previously clustered
-            data(observations)
         """
 
         centroids = []
 
         for k_cluster in range(self.n_clusters):
-            centroids.append(clusterd_data[k_cluster].mean(axis=0))
+            centroids.append(data[k_cluster].mean(axis=0))
 
         return np.array(centroids)
 
-        
+
+
     def clustering(self, data, centroids):
         """
         Clustering data points using the euclidean distance between the observs and the
@@ -148,13 +152,15 @@ class KMeansFromScratch(object):
         for k_cluster in range(self.n_clusters):
             classified_observs = []
 
-            for k in range(len(cluster_indexes)):
-                if k_cluster == cluster_indexes[k]:
-                    classified_observs.append(data[k])
+            for index in range(len(cluster_indexes)):
+                if k_cluster == cluster_indexes[index]:
+                    classified_observs.append(data[index])
 
             data_per_cluster.append(np.array(classified_observs))
 
         return data_per_cluster
+
+
     
     def fit(self, data):
         """
@@ -170,20 +176,22 @@ class KMeansFromScratch(object):
             clusters = self.clustering(data, centroids)
             
             if self.n_iterations <= 0:
-                print("The number of iterations must be at least 3 ... !")
+                print("Oops ! The number of iterations must be at least 3 ... !")
 
             elif self.n_iterations == 1:
-                return clusters, centroids
+                return (clusters, centroids)
             else:
+                # print(f"Before \n{centroids}")
                 for _ in range(self.n_iterations):
                     centroids = self.get_centroids_mean(clusters)
                     clusters = self.clustering(data, centroids) 
-                
+                    # print(f"In loop\n{centroids}")
+
                 KMeansFromScratch.centroids_ = centroids
-                return clusters, centroids
+                return (clusters, centroids)
 
         except Exception as e:
-            print(f"""This {e} has been returned ! The variable data must have the wrong
+            print(f"""Oops ! This {e} has been returned ! The variable data must have the wrong
             data structure ... !\n Please check the fit function args type by running help(fit)
             ... !""")
     
@@ -205,8 +213,8 @@ class KMeansFromScratch(object):
                     distances.append(self.euclidean_distance(centroid, new_entry))
                 
                 cluster = self.get_min_index(distances)
-                print(f""" This data point {new_entry} belongs to the cluster {cluster+1}, and
-                    distances between centroids are {distances} !""")
+                print(f""" This data point {new_entry} belongs to the cluster {cluster+1}, and distances between
+                centroids are {distances} !""")
                 
             else:
                 print(""" Oops ! I did it again...!
@@ -214,15 +222,19 @@ class KMeansFromScratch(object):
         except Exception as e:
             print(f"This {e} occurs !")
 
+
 if __name__ == '__main__':
+
     X = [2, 3]
     Y = [4, 5, 2, 1.5]
 
-    df = pd.read_csv("/home/alain/Documents/MSD/Projects/Kmeans/Notebooks/abalone.csv")
-    header = ['LongestShell', 'Diameter']
-    df = df[header]
-    cluter = KMeansFromScratch(n_clusters=3, n_iterations=4, random_state=47)
-    clusters = cluter.fit(df.values)
-    print(f"The returned centroids \n{clusters[1]} {cluter.predict([2, 0.5])}")
+    data = pd.read_csv("./data/abalone.csv")[['LongestShell', 'Diameter']].values
+
+    model = KMeansFromScratch(n_clusters=3, n_iterations=10, random_state=47)
+    clusters = model.fit(data)
+
+    print(f"The returned centroids_\n{model.centroids_} \n{len(clusters)}")
+    print(f"The returned fit \n{clusters[1]==model.centroids_}")
+
 
 	
