@@ -169,7 +169,7 @@ class KMeansFromScratch(object):
         Arg(s):
             data(np.array): The data to cluster
         Return(s):
-            (tuple): The clusters and the centroids of those clusters
+            (list): The clusters after fitting
         """
         try:
             centroids = self.get_centroids(data)
@@ -179,16 +179,15 @@ class KMeansFromScratch(object):
                 print("Oops ! The number of iterations must be at least 3 ... !")
 
             elif self.n_iterations == 1:
-                return (clusters, centroids)
+                KMeansFromScratch.centroids_ = centroids
+                return clusters
             else:
-                # print(f"Before \n{centroids}")
                 for _ in range(self.n_iterations):
                     centroids = self.get_centroids_mean(clusters)
                     clusters = self.clustering(data, centroids) 
-                    # print(f"In loop\n{centroids}")
 
                 KMeansFromScratch.centroids_ = centroids
-                return (clusters, centroids)
+                return clusters
 
         except Exception as e:
             print(f"""Oops ! This {e} has been returned ! The variable data must have the wrong
@@ -230,11 +229,11 @@ if __name__ == '__main__':
 
     data = pd.read_csv("./data/abalone.csv")[['LongestShell', 'Diameter']].values
 
-    model = KMeansFromScratch(n_clusters=3, n_iterations=10, random_state=47)
+    model = KMeansFromScratch(n_clusters=3, n_iterations=2, random_state=47)
     clusters = model.fit(data)
 
     print(f"The returned centroids_\n{model.centroids_} \n{len(clusters)}")
-    print(f"The returned fit \n{clusters[1]==model.centroids_}")
+    print(f"The returned fit \n{clusters[0]}")
 
 
 	

@@ -16,7 +16,7 @@ class TestKMeansFromScratchMethods(unittest.TestCase):
         model(KMeansFromScratch): The K-means implementation from scratch
         data(np.array)
     """
-    model = KMeansFromScratch(n_clusters=3, n_iterations=2, random_state=47)
+    model = KMeansFromScratch(n_clusters=3, n_iterations=3, random_state=47)
     data = pd.read_csv('./data/abalone.csv')[['LongestShell', 'Diameter']].values
 
     def test_euclidean_distance(self):
@@ -57,7 +57,7 @@ class TestKMeansFromScratchMethods(unittest.TestCase):
         """
         """
         clusters = self.model.fit(self.data)
-        self.assertEqual(len(clusters), 2)
+        self.assertEqual(len(clusters), 3)
 
 
 if __name__ == '__main__':
