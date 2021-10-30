@@ -17,14 +17,13 @@ class TestKMeansFromScratchMethods(unittest.TestCase):
         data(np.array)
     """
     model = KMeansFromScratch(n_clusters=3, n_iterations=3, random_state=47)
-    data = pd.read_csv('./data/abalone.csv')[['LongestShell', 'Diameter']].values
+    data = pd.read_csv('./data/data.csv')[['energie', 'eau']].values
 
     def test_euclidean_distance(self):
         """
         """
-        X = [2, 2]
-        Y = [3, 2]
-        self.assertEqual(self.model.euclidean_distance(X, Y), 1.0)
+        X = np.array([[2, 2], [3, 2]])
+        self.assertEqual(self.model.euclidean_distance(X[0], X[1]), 1.0)
 
     def test_get_centroids(self):
         """
@@ -43,21 +42,13 @@ class TestKMeansFromScratchMethods(unittest.TestCase):
         centroids = self.model.get_centroids(self.data)
         clusters = self.model.clustering(self.data, centroids)
 
-        self.assertEqual(len(clusters), self.model.n_clusters)
-
-    def test_get_centroids_mean(self):
-        """
-        """
-        clusters = self.model.clustering(self.data, self.model.get_centroids(self.data))
-        centroids = self.model.get_centroids_mean(clusters)
-
-        self.assertEqual(len(centroids), self.model.n_clusters)
+        self.assertEqual(len(clusters), 2)
 
     def test_fit(self):
         """
         """
         clusters = self.model.fit(self.data)
-        self.assertEqual(len(clusters), 3)
+        self.assertEqual(len(clusters), 2)
 
 
 if __name__ == '__main__':
